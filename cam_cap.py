@@ -41,13 +41,12 @@ while True:
     emo_idx = np.argmax(prediction)
 
     confidence_rates = np.max(prediction, axis=1)
-    print(confidence_rates)
 
     emotion = emo_list[int(emo_idx)]
 
     if (confidence_rates[0] > 0.80):
         cv2.putText(img, emotion, (30, 30 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12), 2)
-        cv2.imshow('Emotion Detection', img)
+    cv2.imshow('Emotion Detection', img)
 
     # Count emotions
     if emotion in emotion_counter:
@@ -60,8 +59,11 @@ while True:
         if emotion_counter:
             most_common_emotion = max(emotion_counter, key=emotion_counter.get)
             data = {'username': USERNAME, 'password': PASSWORD, 'emotion': most_common_emotion, 'confidenceRate': float(confidence_rates[0])}
-            response = requests.post('http://127.0.0.1:8080/receive_emotion', json=data)
-            print("Data sent to API:", response.json())
+            try:
+                response = requests.post('http://127.0.0.1:8080/receive_emotion', json=data)
+                print("Data sent to API:", response.json())
+            except requests.exceptions.RequestException as e:
+                print("Error sending data to API:", e)
             emotion_counter = {} 
         start_time = time.time()
 
